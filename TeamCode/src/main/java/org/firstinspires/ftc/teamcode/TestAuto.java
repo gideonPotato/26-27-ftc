@@ -9,7 +9,9 @@ import com.pedropathing.math.Pose;
 import static com.pedropathing.api.Paths.*;
 import com.pedropathing.paths.Path;
 import com.pedropathing.ivy.Scheduler;
+import com.pedropathing.ivy.Command;
 import static com.pedropathing.ivy.Scheduler.schedule;
+import static com.pedropathing.ivy.groups.Groups.sequential;
 import static com.pedropathing.ivy.pedro.PedroCommands.follow;
 
 @Autonomous
@@ -18,13 +20,17 @@ public class TestAuto extends OpMode {
     private Follower follower;
     private final PoseFactory p = PoseFactory.degrees();
 
-    private final Pose startPose = p.of(70, 70, 0);
-    private final Pose park = p.of(24, 48, 0);
-    private final Pose test = p.of(24, 24, 180);
+    private final Pose start = p.of(24, 24, 90);
+    private final Pose point1 = p.of(54, 24, 90);
 
-    private Path park() {
-//        return curve(startPose, park, test).linear(startPose, test);
-        return line(startPose, park).linear(startPose, park);
+    private Path test() {
+        return line(start, point1).linear(start, point1);
+    }
+
+    private Command alsoTest() {
+        return sequential(
+                follow(follower, test())
+        );
     }
 
     @Override
@@ -32,12 +38,13 @@ public class TestAuto extends OpMode {
         Scheduler.reset();
 
         follower = Constants.create(hardwareMap);
-        follower.setPose(startPose);
+        follower.setPose(start);
+        follower.update();
     }
 
     @Override
     public void start() {
-        schedule(follow(follower, park()));
+        schedule(alsoTest());
     }
 
     @Override
