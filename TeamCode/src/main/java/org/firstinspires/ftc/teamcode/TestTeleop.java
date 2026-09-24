@@ -26,10 +26,11 @@ public class TestTeleop extends OpMode {
 
     @Override
     public void loop() {
+        double y = gamepad1left_stick_y
         DrivePowers powers = ManualDrive.fieldCentric(
                 -gamepad1.left_stick_y,
-                -gamepad1.left_stick_x,
-                -gamepad1.right_stick_x,
+                gamepad1.left_stick_x,
+                gamepad1.right_stick_x,
                 follower.pose().heading()
         );
 

@@ -9,6 +9,9 @@ import com.pedropathing.tuning.autotune.Tuner;
 //import org.firstinspires.ftc.teamcode.pedro.procedures.ForesightTuner;
 //import org.firstinspires.ftc.teamcode.pedro.procedures.MecanumTuner;
 //import org.firstinspires.ftc.teamcode.pedro.procedures.PinpointTuner;
+import org.firstinspires.ftc.teamcode.pedro.procedures.ForesightTuner;
+import org.firstinspires.ftc.teamcode.pedro.procedures.MecanumTuner;
+import org.firstinspires.ftc.teamcode.pedro.procedures.PinpointTuner;
 import org.firstinspires.ftc.teamcode.pedro.procedures.Tests;
 
 @SuppressWarnings("unused")
@@ -19,13 +22,13 @@ public class Tuning {
                 (hardwareMap -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig)),
                 () -> new Foresight(Constants.foresightConfig));
     }
-//    public static Procedure mecanumTuner() {
-//        return new MecanumTuner();
-//    }
-//    public static Procedure pinpointTuner() {
-//        return new PinpointTuner();
-//    }
-//    public static Procedure foresightTuner() {
-//        return new ForesightTuner((hardwareMap) -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig), (hardwareMap) -> new Mecanum(hardwareMap, Constants.drivetrainConfig));
-//    }
+    public static Procedure mecanumTuner() {
+        return new MecanumTuner();
+    }
+    public static Procedure pinpointTuner() {
+        return new PinpointTuner();
+    }
+    public static Procedure foresightTuner() {
+        return new ForesightTuner((hardwareMap) -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig), (hardwareMap) -> new Mecanum(hardwareMap, Constants.drivetrainConfig));
+    }
 }
