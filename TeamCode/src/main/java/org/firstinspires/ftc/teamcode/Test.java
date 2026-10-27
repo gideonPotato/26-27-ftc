@@ -12,7 +12,6 @@ import org.firstinspires.ftc.robotcontroller.external.samples.SensorGoBildaPinpo
 public class Test extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
-        SensorGoBildaPinpoint pinpoint = hardwareMap.get(SensorGoBildaPinpoint.class, "pinpoint");
 //        DcMotorEx flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
 //        Servo left = hardwareMap.servo.get("left");
 //        Servo right = hardwareMap.servo.get("right");
@@ -41,8 +40,6 @@ public class Test extends LinearOpMode {
 //            left.setPosition(servoPosition);
 //            right.setPosition(servoPosition);
 //            telemetry.addData("AAAAA", servoPosition);
-//            pinpoint.;
-//            telemetry.addData();
             telemetry.update();
         }
     }
