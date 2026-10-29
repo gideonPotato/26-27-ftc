@@ -53,7 +53,7 @@ public class basicDrive extends LinearOpMode {
 
             // ^this can obviously be changed, i'm still unsure what the ideal maximum value to feed to setvelocity is, but 1k is well below it
             // my head hurts (this is unrelated to the code, i probably need water)
-            // the rev website or perhaps the ftc docs probably have the maximum encoder ticks for a bare moter, it shouldn't be hard to find i just don't feel like it
+            // the rev website or perhaps the ftc docs probably have the maximum encoder ticks for a bare motor, it shouldn't be hard to find i just don't feel like it
 
             follower.update();
         }
