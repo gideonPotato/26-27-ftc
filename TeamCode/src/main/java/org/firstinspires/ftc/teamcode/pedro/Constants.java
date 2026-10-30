@@ -37,7 +37,9 @@ public class Constants {
         c.globalDistanceUnit.set(DistanceUnit.INCH);
         c.offsetUnits.set(DistanceUnit.INCH);
     });
-    public static ForesightConfig foresightConfig = new ForesightConfig(
+    public static ForesightConfig acrylicChassisForesight = new ForesightConfig(
+            // making this name specific to the chassis/rest of the bot, so that we can do things like quickly swap to the acrylic panels if the polycarb breaks or something. probably fine to delete as we add more permanent things on though.
+            // in short, don't delete this when you reconfigure, make a new foresightconfig, and name it according to the robot you're tuning it for
             c -> {
                 Controller primaryTranslationalForward = Controller.proportional(0.20209188794684144);
                 Controller secondaryTranslationalForward = Controller.proportional(0.07466755260165885);
@@ -67,7 +69,7 @@ public class Constants {
         return new Follower(
                 new PinpointLocalizer(h, localizerConfig),
                 new Mecanum(h, drivetrainConfig),
-                new Foresight(foresightConfig)
+                new Foresight(acrylicChassisForesight)
         );
     }
 }
