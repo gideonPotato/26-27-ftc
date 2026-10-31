@@ -1,3 +1,5 @@
+package org.firstinspires.ftc.teamcode;
+
 import com.pedropathing.api.PoseFactory;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.Command;
@@ -22,6 +24,7 @@ import org.firstinspires.ftc.teamcode.pedro.Constants;
 public class templateOpMode extends LinearOpMode {
 
 
+    DcMotorEx turretMotor;
     // pedro stuff
     private Follower follower;
     private final PoseFactory poseFactory = PoseFactory.degrees();
@@ -36,6 +39,19 @@ public class templateOpMode extends LinearOpMode {
 
 
     // ivy stuff
+
+    private Command exampleCommand2 = Command.build()
+            .setStart(() -> {
+                turretMotor.setPower(1);
+            })
+            .setDone(() ->
+                turretMotor.getVelocity() > 1000
+                    //this is the condition for it to end yep once the velocity is 1000 it stops
+            )
+            .setEnd(endCondition -> {
+                turretMotor.setPower(0);
+            });
+    // ohhhh this is a bit scrungly i don't like how i did that, but it's fine
     private Command exampleCommand() {
         return parallel(
                 follow(follower, examplePath()),
@@ -48,7 +64,7 @@ public class templateOpMode extends LinearOpMode {
     public void runOpMode() {
         // motors/sensors
 
-        DcMotorEx turretMotor = hardwareMap.get(DcMotorEx.class, "turret");
+        turretMotor = hardwareMap.get(DcMotorEx.class, "turret");
 
         Scheduler.reset();
 
