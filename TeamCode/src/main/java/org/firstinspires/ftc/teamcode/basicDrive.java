@@ -46,9 +46,9 @@ public class basicDrive extends LinearOpMode {
             );
 
             if (gamepad1.left_bumper) {
-                intake.setVelocity(1000);
+                intake.setVelocity(-1000);
             } else if (gamepad1.left_trigger_pressed) {
-                intake.setVelocity(-2500);
+                intake.setVelocity(2500);
             } else {
                 intake.setVelocity(0);
             }

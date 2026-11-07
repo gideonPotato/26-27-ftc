@@ -30,38 +30,36 @@ public class Constants {
     public static PinpointConfig localizerConfig = new PinpointConfig(c -> {
         c.name.set("pinpoint");
         c.podType.set(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        c.xPodOffset.set(-4.744404469888042);
-        c.yPodOffset.set(1.8993804210752954);
+        c.xPodOffset.set(-0.3193876686997301);
+        c.yPodOffset.set(2.091904888002891);
         c.xPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
-        c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.REVERSED);
+        c.yPodDirection.set(GoBildaPinpointDriver.EncoderDirection.FORWARD);
         c.globalDistanceUnit.set(DistanceUnit.INCH);
         c.offsetUnits.set(DistanceUnit.INCH);
     });
-    public static ForesightConfig acrylicChassisForesight = new ForesightConfig(
-            // making this name specific to the chassis/rest of the bot, so that we can do things like quickly swap to the acrylic panels if the polycarb breaks or something. probably fine to delete as we add more permanent things on though.
-            // in short, don't delete this when you reconfigure, make a new foresightconfig, and name it according to the robot you're tuning it for
+    public static ForesightConfig foresightConfig = new ForesightConfig(
             c -> {
-                Controller primaryTranslationalForward = Controller.proportional(0.20209188794684144);
-                Controller secondaryTranslationalForward = Controller.proportional(0.07466755260165885);
-                Controller primaryTranslationalLateral = Controller.proportional(0.30582425640434585);
-                Controller secondaryTranslationalLateral = Controller.proportional(0.11299389096677295);
+                Controller primaryTranslationalForward = Controller.proportional(0.20411422118522923);
+                Controller secondaryTranslationalForward = Controller.proportional(0.07541475069550378);
+                Controller primaryTranslationalLateral = Controller.proportional(0.2858239298403635);
+                Controller secondaryTranslationalLateral = Controller.proportional(0.10560430471994976);
 
                 c.forwardTranslational.set(Controller.piecewise(secondaryTranslationalForward).put(2.5, primaryTranslationalForward));
                 c.strafeTranslational.set(Controller.piecewise(secondaryTranslationalLateral).put(2.5, primaryTranslationalLateral));
 
-                c.coast.set(Controller.proportionalFeedforward(0.013827601909211769));
-                c.brake.set(Controller.proportionalFeedforward(0.011753461622830003));
+                c.coast.set(Controller.proportionalFeedforward(0.013558414151632909));
+                c.brake.set(Controller.proportionalFeedforward(0.011524652028887972));
 
-                c.headingFeedback.set(Controller.proportional(3.0465447728745176));
-                c.headingBrakeCoefficients.set(Vector2D.cartesian(0.03117027220958883, 0.0078958638915876));
+                c.headingFeedback.set(Controller.proportional(3.720938385399612));
+                c.headingBrakeCoefficients.set(Vector2D.cartesian(0.007955569330621666, 0.010668993549984239));
 
-                c.linearBrakeCoefficients.set(Matrix.diag(0.031024229126925745, 0.022403198522584624));
-                c.quadraticBrakeCoefficients.set(Matrix.diag(0.001961232816509029, 0.0021068267650300116));
+                c.linearBrakeCoefficients.set(Matrix.diag(0.06105931823810646, 0.06501096024263785));
+                c.quadraticBrakeCoefficients.set(Matrix.diag(0.0016335831916999485, 0.0014372293574637168));
 
-                c.maxAchievableForwardVelocity.set(72.80987298831698);
-                c.maxAchievableStrafeVelocity.set(63.68403713194634);
-                c.naturalForwardDeceleration.set(61.723391453690326);
-                c.naturalStrafeDeceleration.set(82.90260329801517);
+                c.maxAchievableForwardVelocity.set(76.38856947837264);
+                c.maxAchievableStrafeVelocity.set(62.96096249922226);
+                c.naturalForwardDeceleration.set(50.55301383805567);
+                c.naturalStrafeDeceleration.set(89.1998395410951);
             }
     );
 
@@ -69,7 +67,7 @@ public class Constants {
         return new Follower(
                 new PinpointLocalizer(h, localizerConfig),
                 new Mecanum(h, drivetrainConfig),
-                new Foresight(acrylicChassisForesight)
+                new Foresight(foresightConfig)
         );
     }
 }
