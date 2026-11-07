@@ -57,11 +57,6 @@ public class redTeleop extends LinearOpMode {
         launching
     }
 
-    {
-        EnumMap<BotStates, Command> states = new EnumMap<>(BotStates.class);
-        states.put(BotStates.intaking, runIntake); // what what what what what i can't reference the nonstatic runintake from inside the static thing, and i can't make the runintake static because it needs to depend on things like the number of balls oh dear everything is melting :(
-    }
-
     // variables
 
     int ballCount = 0; // will need to carry from auto

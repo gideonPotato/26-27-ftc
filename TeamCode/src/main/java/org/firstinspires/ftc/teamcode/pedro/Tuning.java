@@ -20,18 +20,18 @@ public class Tuning {
 //        return new MecanumTuner();
 //    }
 //
-//    public static Procedure pinpointTuner() {
-//        return new PinpointTuner();
-//    }
+    public static Procedure pinpointTuner() {
+        return new PinpointTuner();
+    }
 //    public static Procedure foresightTuner() {
 //        return new ForesightTuner((hardwareMap) -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig), (hardwareMap) -> new Mecanum(hardwareMap, Constants.drivetrainConfig));
 //    }
 
-    public static Procedure tests() {
-        return new Tests(
-                hardwareMap -> new Mecanum(hardwareMap, Constants.drivetrainConfig),
-                (hardwareMap -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig)),
-                () -> new Foresight(Constants.acrylicChassisForesight)
-        );
-    }
+//    public static Procedure tests() {
+//        return new Tests(
+//                hardwareMap -> new Mecanum(hardwareMap, Constants.drivetrainConfig),
+//                (hardwareMap -> new PinpointLocalizer(hardwareMap, Constants.localizerConfig)),
+//                () -> new Foresight(Constants.acrylicChassisForesight)
+//        );
+//    }
 }
