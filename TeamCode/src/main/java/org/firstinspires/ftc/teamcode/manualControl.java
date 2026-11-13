@@ -84,11 +84,13 @@ public class manualControl extends LinearOpMode {
         if (angle <= 360 && angle >= 0) {
             double pos = angle * encoderTicksPerTurretDegree;
             double currentPos = turretMotor.getCurrentPosition();
-            double error = currentPos - pos;
-            turretMotor.setVelocity((int) error);
-//            turretMotor.setTargetPosition((int) pos);
-//            turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            turretMotor.setVelocity(20);
+            double error = pos - currentPos;
+            telemetry.addData("current position:", currentPos);
+            telemetry.addData("goal position", pos);
+//            turretMotor.setVelocity((int) error);
+            turretMotor.setTargetPosition((int) pos);
+            turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            turretMotor.setVelocity(20);
         } else {
             telemetry.addData("hey you're trying to move the turret outside of its range, more specifically", angle);
         }
