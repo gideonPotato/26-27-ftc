@@ -18,8 +18,6 @@ import static com.pedropathing.ivy.commands.Commands.infinite;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
-import java.util.EnumMap;
-
 // this is just me trying to see how much code i can get done because my brain isn't letting me do anything else
 
 /* going to just put random notes up here because uhh
@@ -180,19 +178,29 @@ public class redTeleop extends LinearOpMode {
                 return blueGoalAudience;
             }
         }
-
-        // TODO: make this work for red and blue alliances, not just red
     }
 
     private double getTurretHeading() {
         // i hope this is correct (if not just negate these values)
         double x = goalPose.x() - robotPose.x();
         double y = goalPose.y() - robotPose.y();
-        double absoluteHeading = Math.tan(y/x);
+        double absoluteHeading = Math.atan(y/x); // TODO: OH BINGLE I JUST REALIZED THAT I HAVEN'T BEEN KEEPING TRACK OF WHAT'S SUPPOSED TO BE TANGENT AND WHAT'S INVERSE TANGEN OHHH NOOO
         return absoluteHeading - robotPose.heading();
     }
 
-    private void setTurretTrajectory() {
+    private double setTurretTrajectory(double xDist, double yDist) {
+        double hiveAngle=30;
+        double yOffset=2;
+        double g = -9.8;
+
+        double a = ((yDist+yOffset)-(Math.tan(-hiveAngle)*xDist)/(xDist*xDist));
+        double b = -2*a*xDist+Math.tan(-hiveAngle);
+        double m = -b/(2*a);
+
+
+        double velocity = Math.sqrt(-2*g*(a*m*m+b*m));
+        double theta = Math.atan((a*(m+.001)*(m+.001)+b*(m+.001)-a*m*m-b*m)*.001);
+        return 10.0;
         // TODO: make this set both the velocity and the angle of launch
     }
 

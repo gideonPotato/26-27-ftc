@@ -2,10 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.ManualDrive;
-import com.pedropathing.drivetrain.DrivePowers;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
@@ -25,9 +25,15 @@ public class basicDrive extends LinearOpMode {
         // motors/sensors
 
         DcMotorEx intake = hardwareMap.get(DcMotorEx.class, "intake");
+        DcMotorEx flywheel = hardwareMap.get(DcMotorEx.class, "flywheel");
+        DcMotorEx turret = hardwareMap.get(DcMotorEx.class, "turret");
+        Servo leftHood = hardwareMap.get(Servo.class, "left");
+        Servo rightHood = hardwareMap.get(Servo.class, "right");
 
         follower = Constants.create(hardwareMap);
 
+        double flywheelSpeed = 4000;
+        double servoHood = 0.5;
 
         waitForStart();
         if (isStopRequested()) return;
@@ -52,8 +58,27 @@ public class basicDrive extends LinearOpMode {
             } else {
                 intake.setVelocity(0);
             }
+            flywheel.setVelocity(flywheelSpeed);
 
-            follower.update();
+            if (gamepad1.dpadDownWasReleased()) {
+                flywheelSpeed -= 50;
+            }
+            if (gamepad1.dpadUpWasReleased()) {
+                flywheelSpeed += 50;
+            }
+            if (gamepad1.dpadLeftWasReleased()) {
+                servoHood -= .05;
+            }
+            if (gamepad1.dpadRightWasReleased()) {
+                servoHood += .05;
+            }
+            leftHood.setPosition(servoHood);
+            rightHood.setPosition(1-servoHood);
+            turret.setPower(gamepad2.left_stick_y);
+
+            telemetry.addData("speed", flywheelSpeed);
+            telemetry.addData("angle", servoHood);
+            telemetry.update();
         }
     }
 }
