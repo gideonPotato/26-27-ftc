@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.pedropathing.follower.Follower;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 @TeleOp
@@ -80,20 +81,22 @@ public class manualControl extends LinearOpMode {
     }
 
     private void moveTurret(double angle) {
-        // currently basically just inverse tan, not utilizing the >360 range yet
-        if (angle <= 360 && angle >= 0) {
-            double pos = angle * encoderTicksPerTurretDegree;
-            double currentPos = turretMotor.getCurrentPosition();
-            double error = pos - currentPos;
-            telemetry.addData("current position:", currentPos);
-            telemetry.addData("goal position", pos);
-//            turretMotor.setVelocity((int) error);
-            turretMotor.setTargetPosition((int) pos);
-            turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            turretMotor.setVelocity(20);
-        } else {
-            telemetry.addData("hey you're trying to move the turret outside of its range, more specifically", angle);
-        }
+        double target = angle * encoderTicksPerTurretDegree;
+        double currentTicks = turretMotor.getCurrentPosition();
+        double currentAngle = currentTicks / encoderTicksPerTurretDegree;
+        telemetry.addData("current ticks", currentTicks);
+        telemetry.addData("current relative turret angle", currentAngle);
+        double p = 1;
+        double d = -1; // THIS SHOULD BE MOVED TO BE CONSTANTS, AND NOT CREATED EVERY LOOP IF DOING THIS WORKS
+        double currentVelocity = turretMotor.getVelocity(AngleUnit.DEGREES);
+        double error = target - currentAngle;
+        double max = 360;
+        double whatDoICallThis = p * error + d * currentVelocity;
+        double power = whatDoICallThis/max;
+        turretMotor.setPower(power);
+//        turretMotor.setTargetPosition((int) target);
+//        turretMotor.setVelocity(-200);
+
     }
 
     private Pose getCurrentTarget() { // copied from what was at the time redTeleop.java, which may or may not exist by the time you read this
@@ -142,6 +145,7 @@ public class manualControl extends LinearOpMode {
 
     private void runTurret() {
         double relativeHeading = getTurretHeading();
+        telemetry.addData("heading on the robot of the turret (target)", relativeHeading);
         moveTurret(relativeHeading);
     }
 
@@ -191,6 +195,7 @@ public class manualControl extends LinearOpMode {
 
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         leftHood = hardwareMap.get(Servo.class, "left");
         rightHood = hardwareMap.get(Servo.class, "right");
