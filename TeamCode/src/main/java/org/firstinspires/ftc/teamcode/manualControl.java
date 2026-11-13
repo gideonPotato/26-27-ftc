@@ -46,8 +46,8 @@ public class manualControl extends LinearOpMode {
     double blockerOpen = 0.55; //both of these set to smaller values to hopefully not break things
 
     double servoRangesPerHoodDegree = 0; // currently set to 0 so it won't move until we get an actually correct value set
-    double encoderTicksPerTurretDegree = 0; // same as above
-    double encoderTicksPerFlywheelCircumferenceInch = 0;
+    double encoderTicksPerTurretDegree = 2.96; // same as above
+    double encoderTicksPerFlywheelCircumferenceInch = 3.14606;
 
     Alliance currentAlliance = Alliance.red;
 
@@ -56,7 +56,7 @@ public class manualControl extends LinearOpMode {
     private final Pose blueGoalAudience = poseFactory.of(84, 50, 0);
     private final Pose blueGoalScoring = poseFactory.of(84, 94, 0);
 
-    private final Pose startPose = poseFactory.of(10, 10, 0); // start the bot in this position (red tape corner, forward facing along red alliance area)
+    private final Pose startPose = poseFactory.of(6.25, 5, Math.toRadians(90)); // start the bot in this position (red tape corner, forward facing along red alliance area)
 
 
     // binds
@@ -83,9 +83,12 @@ public class manualControl extends LinearOpMode {
         // currently basically just inverse tan, not utilizing the >360 range yet
         if (angle <= 360 && angle >= 0) {
             double pos = angle * encoderTicksPerTurretDegree;
-            turretMotor.setTargetPosition((int) pos);
-            turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            turretMotor.setPower(.1);
+            double currentPos = turretMotor.getCurrentPosition();
+            double error = currentPos - pos;
+            turretMotor.setVelocity((int) error);
+//            turretMotor.setTargetPosition((int) pos);
+//            turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            turretMotor.setVelocity(20);
         } else {
             telemetry.addData("hey you're trying to move the turret outside of its range, more specifically", angle);
         }
@@ -109,11 +112,10 @@ public class manualControl extends LinearOpMode {
     }
 
     private double getTurretHeading() {
-        // i hope this is correct (if not just negate these values)
         double x = goalPose.x() - robotPose.x();
         double y = goalPose.y() - robotPose.y();
-        double absoluteHeading = Math.atan(y/x);
-        return absoluteHeading - robotPose.heading();
+        double absoluteHeading = Math.atan2(y, x);
+        return Math.toDegrees(absoluteHeading - robotPose.heading());
     }
 
     private void setTrajectory() {
@@ -137,18 +139,15 @@ public class manualControl extends LinearOpMode {
     }
 
     private void runTurret() {
-        double turretHeading = getTurretHeading();
-        double robotHeading = robotPose.heading();
-        double relativeHeading = turretHeading - robotHeading;
-        relativeHeading = Math.toDegrees(relativeHeading);
+        double relativeHeading = getTurretHeading();
         moveTurret(relativeHeading);
     }
 
     private void drive() {
         DrivePowers powers = ManualDrive.fieldCentric(
                 -gamepad1.left_stick_y,
-                gamepad1.left_stick_x,
-                gamepad1.right_stick_x,
+                -gamepad1.left_stick_x,
+                -gamepad1.right_stick_x,
                 follower.pose().heading()
         );
         follower.manual(powers);
@@ -160,11 +159,11 @@ public class manualControl extends LinearOpMode {
     private void randomStuff() {
         if (shouldIntake()) {
             intakeMotor.setPower(1);
-        }
+        } else intakeMotor.setPower(0);
 
         if (shouldTransfer()) {
-            transferMotor.setPower(1);
-        }
+            transferMotor.setPower(.75);
+        } else transferMotor.setPower(0);
 
         blockerServo.setPosition((shouldLaunch()) ? blockerOpen : blockerClosed); // (bool) ? thing1 : thing2 is equivalent to if (bool) { thing1 } else { thing2 }
     }
@@ -184,11 +183,12 @@ public class manualControl extends LinearOpMode {
         flywheelMotor = hardwareMap.get(DcMotorEx.class, "flywheel");
 
         intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        transferMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        transferMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         turretMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         flywheelMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         leftHood = hardwareMap.get(Servo.class, "left");
         rightHood = hardwareMap.get(Servo.class, "right");
@@ -228,6 +228,10 @@ public class manualControl extends LinearOpMode {
             randomStuff();
             runTurret();
             setTrajectory();
+
+            telemetry.addData("x", robotPose.x());
+            telemetry.addData("y", robotPose.y());
+            telemetry.addData("heading", robotPose.heading());
 
             telemetry.update();
         }
