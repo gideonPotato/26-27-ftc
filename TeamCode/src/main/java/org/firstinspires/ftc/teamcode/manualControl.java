@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.pedropathing.follower.Follower;
 
+
 import org.firstinspires.ftc.teamcode.pedro.Constants;
 
 @TeleOp
@@ -32,6 +33,25 @@ public class manualControl extends LinearOpMode {
     Servo rightHood;
 
     Servo blockerServo;
+
+    // pid variables
+    // Tuning values
+    double p = 0.2;
+    double i = 0.01;
+    double d = 0.1;
+
+    // others
+
+    double iv = 0;
+
+    double pv = 0;
+
+    double dv = 0;
+
+    double ppv = 0;
+
+
+
 
 
     enum Alliance {
@@ -56,8 +76,8 @@ public class manualControl extends LinearOpMode {
 
     private final Pose redGoalAudience = poseFactory.of(60, 50, 0);
     private final Pose redGoalScoring = poseFactory.of(60, 94, 0);
-    private final Pose blueGoalAudience = poseFactory.of(84, 50, 0);
-    private final Pose blueGoalScoring = poseFactory.of(84, 94, 0);
+    private final Pose blueGoalAudience = poseFactory.of(89, 50, 0);
+    private final Pose blueGoalScoring = poseFactory.of(89, 94, 0);
 
     private final Pose startPose = poseFactory.of(6.25, 5, Math.toRadians(90)); // start the bot in this position (red tape corner, forward facing along red alliance area)
 
@@ -118,7 +138,7 @@ public class manualControl extends LinearOpMode {
 //            // this should fix it though
 //        }
         turretMotor.setTargetPosition((int) target);
-        turretMotor.setVelocity(100); //increase this if needed
+        turretMotor.setVelocity(3000); //increase this if needed
 //        turretMotor.setPower(power);
 //        telemetry.addData("turret current", turretMotor.getCurrent(CurrentUnit.AMPS));
 //        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -162,7 +182,9 @@ public class manualControl extends LinearOpMode {
         double g = 385.8268; // this is 9.8 m/s^2 in inches per second^2 because we're in inches for some reason
         double exitVelocity = vertexY / vertexX - .5 * g * vertexX;
         int flywheelVelocity = (int) (exitVelocity * encoderTicksPerFlywheelCircumferenceInch); // in/s * ticks/in = ticks/s which i think is what we want
-        flywheelMotor.setVelocity(flywheelVelocity);
+        double PIDValue = PIDLoop(flywheelVelocity, flywheelMotor.getVelocity());
+        double targetVelocity = PIDValue + Math.abs(flywheelVelocity) * .8;
+        flywheelMotor.setVelocity(targetVelocity);
 
         // ax^2+bx is our parabola, so 2ax+b should be its derivative
         // at the origin (also where we launch from) the derivative is 2a(0)+b -> b
@@ -201,6 +223,19 @@ public class manualControl extends LinearOpMode {
         blockerServo.setPosition((shouldLaunch()) ? blockerOpen : blockerClosed); // (bool) ? thing1 : thing2 is equivalent to if (bool) { thing1 } else { thing2 }
     }
 
+    private double PIDLoop(double targetVelocity, double realVelocity) {
+
+        pv = targetVelocity - realVelocity;
+
+        iv += pv;
+
+        dv = pv - ppv;
+
+        ppv = pv;
+
+        return(p * pv  +  i * iv  +  d * dv);
+    }
+
 
     @Override
     public void runOpMode() {
@@ -227,28 +262,7 @@ public class manualControl extends LinearOpMode {
 
         blockerServo = hardwareMap.get(Servo.class, "blocker");
 
-        telemetry.addLine("YOU'D BETTER HAVE THE TURRET UNPLUGGED AND FACING FORWARDS");
-        telemetry.addLine("INSERT A LOT OF TEXT TO MAKE IT REALLY OBVIOUS THAT THERE'S SOMETHING HERE");
-        telemetry.addLine("      #####  ");
-        telemetry.addLine("     #&@@@&# ");
-        telemetry.addLine("    #@@@@@@&#");
-        telemetry.addLine("   #&@@@@&@@#");
-        telemetry.addLine("   #@@@@@&&@#");
-        telemetry.addLine("   #@@&,,,,##");
-        telemetry.addLine("   #@&,....##");
-        telemetry.addLine("  ##===,,,#&#");
-        telemetry.addLine(" #==**--==## ");
-        telemetry.addLine(" #***-*|--*# ");
-        telemetry.addLine(" #**||,.||,,#");
-        telemetry.addLine(" #/*=|,.||,,#");
-        telemetry.addLine("#/%*==*****# ");
-        telemetry.addLine("#//= ======# ");
-        telemetry.addLine(" ###=**##**# ");
-        telemetry.addLine("   #**# #**# ");
-        telemetry.addLine("   #*,# #*,# ");
-        telemetry.addLine("madeline stretcheleste");
-        telemetry.addLine("i put way too much effort into making this");
-        telemetry.addLine("this is going to look really stupid if the font's not monospace, but it should still work");
+
         telemetry.update();
 
         waitForStart();
