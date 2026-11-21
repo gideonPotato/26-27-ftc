@@ -43,23 +43,14 @@ public class manualControl extends LinearOpMode {
     // others
 
     double iv = 0;
-
     double pv = 0;
-
     double dv = 0;
-
     double ppv = 0;
-
-
-
-
 
     enum Alliance {
         red,
         blue
     }
-
-    double previousError = 0;
 
     private final PoseFactory poseFactory = PoseFactory.radians();
 
@@ -69,7 +60,7 @@ public class manualControl extends LinearOpMode {
     double blockerOpen = 0.55; //both of these set to smaller values to hopefully not break things
 
     double servoRangesPerHoodDegree = 0; // currently set to 0 so it won't move until we get an actually correct value set
-    double encoderTicksPerTurretDegree = -2.96; // same as above        this is negative because a positive encoder tick gives a negative turret degree
+    double encoderTicksPerTurretDegree = -2.96; // this is negative because a positive encoder tick gives a negative turret degree
     double encoderTicksPerFlywheelCircumferenceInch = 3.14606;
 
     Alliance currentAlliance = Alliance.red;
@@ -115,36 +106,8 @@ public class manualControl extends LinearOpMode {
         telemetry.addData("current relative turret angle", currentAngle);
         telemetry.addData("current error", error);
         turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//        double power = 0;
-//        if (error < -1) {
-////            power = .1;
-//            turretMotor.setPower(.5*error/360);
-////            turretMotor.setVelocity(100);
-//            telemetry.addLine("going positive power (clockwise)");
-//        } else if (error > 1) {
-////            power = -.1;
-//            turretMotor.setPower(-.5*error/360);
-////            turretMotor.setVelocity(-100);
-//            telemetry.addLine("going negative power (counterclockwise)");
-//        } else {
-////            power = 0;
-////            turretMotor.setVelocity(0);
-//            turretMotor.setPower(0);
-//            telemetry.addLine("not moving");
-//        }
-//        if (Math.abs(error) > Math.abs(previousError)) {
-//            power *= -1;
-//            // i hate this i hate this i hate this why does it randomly invert
-//            // this should fix it though
-//        }
         turretMotor.setTargetPosition((int) target);
-        turretMotor.setVelocity(3000); //increase this if needed
-//        turretMotor.setPower(power);
-//        telemetry.addData("turret current", turretMotor.getCurrent(CurrentUnit.AMPS));
-//        turretMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        previousError = error;
-
+        turretMotor.setVelocity(3000);
     }
 
     private Pose getCurrentTarget() { // copied from what was at the time redTeleop.java, which may or may not exist by the time you read this
