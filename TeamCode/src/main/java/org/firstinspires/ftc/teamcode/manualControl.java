@@ -96,7 +96,6 @@ public class manualControl extends LinearOpMode {
     }
 
     private void moveTurret(double angle) {
-        angle *= -1;
         double target = angle * encoderTicksPerTurretDegree;
         double currentTicks = turretMotor.getCurrentPosition();
         double currentAngle = currentTicks / encoderTicksPerTurretDegree;
@@ -135,7 +134,7 @@ public class manualControl extends LinearOpMode {
     }
 
     private void setTrajectory() {
-        double m = -55; // final slope
+        double m = -55; // final slope              FOR FUTURE REFERENCE: I THINK THE REASON THIS DIDN'T WORK WELL WAS BECAUSE THIS VALUE IS AN ANGLE IN DEGREES WHEN IT SHOULD BE THE EQUIVALENT SLOPE
         double x = Math.sqrt(Math.pow(goalPose.x() - robotPose.x(), 2) + Math.pow(goalPose.y() - robotPose.y(), 2)); // direct horizontal distance from center of robot to goal (if this is inaccurate, that's probably because the turret isn't centered on the chassis)
         double y = 60 - 12; // general estimate on the vertical distance from the center of the goal (60) to the turret (12). both are approximate, and in inches
         double a = m * (x - y) / Math.pow(x, 2); // quadratic formula reference
