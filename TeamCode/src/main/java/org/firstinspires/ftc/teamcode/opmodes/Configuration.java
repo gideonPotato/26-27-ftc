@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 // helper opmode, just displays the position of a few things without running anything, so that we can find conversions
 
 @TeleOp
-public class configuration extends LinearOpMode {
+public class Configuration extends LinearOpMode {
 
     static double min = .277;
     static double max = .722;

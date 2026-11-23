@@ -7,29 +7,27 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.robot.BallCountClass;
-import org.firstinspires.ftc.teamcode.robot.deviceNames;
+import org.firstinspires.ftc.teamcode.robot.RobotConstants.*;
 
 public class Transfer {
     private final DcMotorEx motor;
     private final Rev2mDistanceSensor beam;
-    public BallCountClass ballCount;
+    private BallCountClass ballCounter;
     private boolean triggered = false;
-    private final double distance = 0; // this should be a bit less than the distance the beam break reads with no ball in the spot
 
-    static double in = 1;
-    static double hold = 0;
-    static double out = -.5;
-
-    public Transfer(HardwareMap hardwareMap, BallCountClass ballCount) {
-        motor = hardwareMap.get(DcMotorEx.class, deviceNames.transfer);
-        beam = hardwareMap.get(Rev2mDistanceSensor.class, deviceNames.beamBreak);
-        this.ballCount = ballCount;
+    public Transfer(HardwareMap hardwareMap, BallCountClass ballCounter) {
+        motor = hardwareMap.get(DcMotorEx.class, DeviceNames.transferMotor);
+        beam = hardwareMap.get(Rev2mDistanceSensor.class, DeviceNames.transferBeamBreak);
+        this.ballCounter = ballCounter;
     }
 
-    private void runIn(){motor.setPower(in);}
-    private void runOut(){motor.setPower(out);}
-    private void runHold(){motor.setPower(hold);}
+    private void run(double power){
+        motor.setPower(power);
+    }
+
+    private void runIn(){run(SubsystemConstants.transferIn);}
+    private void runOut(){run(SubsystemConstants.transferOut);}
+    private void runHold(){run(SubsystemConstants.transferHold);}
 
     public Command in() {
         return Commands.instant(this::runIn);
@@ -41,11 +39,11 @@ public class Transfer {
         return Commands.instant(this::runHold);
     }
 
-    private Command countBalls(){
+    public Command countBalls(){
         return Commands.infinite(() -> {
-            if (beam.getDistance(DistanceUnit.MM) < distance) {
+            if (beam.getDistance(DistanceUnit.MM) < SubsystemConstants.beamBreakDistance) {
                 if (!triggered) {
-                    ballCount.balls++;
+                    ballCounter.balls++;
                     triggered = true;
                 }
             } else {
@@ -55,10 +53,8 @@ public class Transfer {
     }
 
     public Command runTransfer = Commands.conditional(
-            () -> (ballCount.balls < 4),
+            () -> (ballCounter.balls < 4),
             in(),
             hold()
-    ).with(
-            countBalls()
     );
 }

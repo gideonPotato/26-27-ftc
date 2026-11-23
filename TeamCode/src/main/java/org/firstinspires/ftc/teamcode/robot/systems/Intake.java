@@ -1,36 +1,33 @@
 package org.firstinspires.ftc.teamcode.robot.systems;
 
 
+
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.commands.Commands;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.robot.BallCountClass;
-import org.firstinspires.ftc.teamcode.robot.deviceNames;
+import org.firstinspires.ftc.teamcode.robot.RobotConstants.*;
 
 public class Intake {
-    private DcMotorEx motor;
-    static double inwards = 1;
-    static double eject = -1;
-    static double hold = 0;
-    static double idle = -.5;
-    private BallCountClass ballCount;
+    private final DcMotorEx motor;
+    private BallCountClass ballCounter;
 
-    public void map(HardwareMap hardwareMap, BallCountClass ballCount) {
-        motor = hardwareMap.get(DcMotorEx.class, deviceNames.intake);
-        this.ballCount=ballCount;
+    public Intake(HardwareMap hardwareMap, BallCountClass ballCounter) {
+        motor = hardwareMap.get(DcMotorEx.class, DeviceNames.intakeMotor);
+        this.ballCounter = ballCounter;
     }
 
-    public void run(double power){
+    private void run(double power){
         motor.setPower(power);
     }
 
-    public void runIn() {run(inwards);}
-    public void runOut() {run(eject);}
-    public void runHold() {run(hold);}
-    public void runIdle() {run(idle);}
+    private void runIn() {run(SubsystemConstants.intakeIn);}
+    private void runOut() {run(SubsystemConstants.intakeOut);}
+    private void runHold() {run(SubsystemConstants.intakeHold);}
+    private void runIdle() {run(SubsystemConstants.intakeIdle);}
 
+    // these are only public if you want to manually override something. might be worth doing that as a command that runs in parallel with/overwrites runIntake when you implement it
     public Command in() {
         return Commands.instant(this::runIn);
     }
@@ -47,6 +44,6 @@ public class Intake {
         return Commands.instant(this::runIdle);
     }
 
-    public Command runIntake = Commands.conditional(() -> (ballCount.balls < 4), in(), out());
+    public Command runIntake = Commands.conditional(() -> (ballCounter.balls < 4), in(), idle());
 
 }
