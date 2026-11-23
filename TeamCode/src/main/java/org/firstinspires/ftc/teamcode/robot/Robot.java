@@ -50,7 +50,7 @@ public class Robot {
                 transfer.countBalls(),
                 flywheel.countBalls(),
 
-                goalTracker.update,
+                goalTracker.updateGoal,
                 lynxHandler.update,
 
                 drivetrain.driveWithPowers(inputs.driveForward(), inputs.driveLateral(), inputs.driveAngular()),

@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.robot.RobotConstants.*;
 public class GoalTracker {
     private final Follower follower;
     private final Alliance alliance;
-    public Pose goal;
+    public Pose goal = new Pose(0,0); // initialize a pose so we don't get a null pointer
 
     public GoalTracker(Follower follower, Alliance alliance) {
         this.follower = follower;
@@ -22,5 +22,5 @@ public class GoalTracker {
             if (alliance == Alliance.BLUE) goal = Poses.blueAudience; else goal = Poses.redAudience;
         } else if (alliance == Alliance.BLUE) goal = Poses.blueScoring; else goal = Poses.redScoring;
     }
-    public Command update = Commands.instant(this::updateGoal);
+    public Command updateGoal = Commands.instant(this::updateGoal);
 }
