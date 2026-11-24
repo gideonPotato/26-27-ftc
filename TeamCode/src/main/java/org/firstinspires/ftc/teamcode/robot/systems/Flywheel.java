@@ -3,10 +3,13 @@ package org.firstinspires.ftc.teamcode.robot.systems;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.commands.Commands;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.RobotConstants;
 import org.firstinspires.ftc.teamcode.robot.RobotConstants.*;
 
 public class Flywheel {
@@ -16,12 +19,13 @@ public class Flywheel {
     private final GoalTracker goalTracker;
     private final Servo left;
     private final Servo right;
+    private final Telemetry telemetry;
 
     private double targetFlywheelVelocity = 0;
     private double previousFlywheelVelocity = 0;
     private boolean speedDipAlreadyCounted = false;
 
-    public Flywheel(HardwareMap hardwareMap, BallCountClass ballCounter, Follower follower, GoalTracker goalTracker) {
+    public Flywheel(HardwareMap hardwareMap, BallCountClass ballCounter, Follower follower, GoalTracker goalTracker, Telemetry telemetry) {
         motor = hardwareMap.get(DcMotorEx.class, DeviceNames.flywheelMotor);
         left = hardwareMap.get(Servo.class, DeviceNames.leftHoodServo);
         right = hardwareMap.get(Servo.class, DeviceNames.rightHoodServo);
@@ -29,6 +33,7 @@ public class Flywheel {
         this.follower = follower;
         // TODO: REPLACE FOLLOWER WITH TURRET LOCALIZER
         this.goalTracker = goalTracker;
+        this.telemetry = telemetry;
     }
 
     private double hoodAngleToServoPosition(double angle) {
@@ -41,16 +46,25 @@ public class Flywheel {
     }
 
     private void runHood(double angle) {
-        angle = hoodAngleToServoPosition(angle);
-        angle += SubsystemConstants.hoodServoOffset; // added because 0 on the servos is not straight up
-        left.setPosition(angle);
-        right.setPosition(1-angle);
+        if (!SubsystemConstants.debug) {
+            angle = hoodAngleToServoPosition(angle);
+            angle += SubsystemConstants.hoodServoOffset; // added because 0 on the servos is not straight up
+            left.setPosition(angle);
+            right.setPosition(1 - angle);
+        } else {
+            telemetry.addData("turret hood angle", angle);
+        }
     }
 
     private void runFlywheel(double tangentialSpeed) {
         int ticks = tangentialSpeedToFlywheelTicks(tangentialSpeed);
         // TODO: IMPLEMENT PID CONTROLLER HERE
-        motor.setVelocity(ticks);
+        if (!SubsystemConstants.debug) {
+            motor.setVelocity(ticks);
+        } else {
+            telemetry.addData("flywheel ticks", ticks);
+            telemetry.addData("flywheel velocity", tangentialSpeed);
+        }
     }
 
     private double getHorizontalTargetDistance(){

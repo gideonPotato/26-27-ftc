@@ -4,6 +4,7 @@ import com.pedropathing.ivy.Command;
 import com.pedropathing.ivy.commands.Commands;
 import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -17,6 +18,7 @@ public class Transfer {
 
     public Transfer(HardwareMap hardwareMap, BallCountClass ballCounter) {
         motor = hardwareMap.get(DcMotorEx.class, DeviceNames.transferMotor);
+        motor.setDirection(DcMotorSimple.Direction.REVERSE);
         beam = hardwareMap.get(Rev2mDistanceSensor.class, DeviceNames.transferBeamBreak);
         this.ballCounter = ballCounter;
     }

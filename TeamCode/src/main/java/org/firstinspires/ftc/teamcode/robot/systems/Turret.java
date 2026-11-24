@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.RobotConstants.*;
 
 public class Turret {
@@ -19,13 +20,14 @@ public class Turret {
     private final GoalTracker goalTracker;
     private final Follower follower;
     private final BallCountClass ballCounter;
+    private final Telemetry telemetry;
 
     private int leftHomePosition;
     private int rightHomePosition;
 
     private boolean triggered; // used for both left and right switches, used to check for a change in state
 
-    public Turret(HardwareMap hardwareMap, GoalTracker goalTracker, Follower follower, BallCountClass ballCounter){
+    public Turret(HardwareMap hardwareMap, GoalTracker goalTracker, Follower follower, BallCountClass ballCounter, Telemetry telemetry){
         motor = hardwareMap.get(DcMotorEx.class, DeviceNames.turretMotor);
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftLimit = hardwareMap.get(RevTouchSensor.class, DeviceNames.leftTurretLimitSwitch);
@@ -34,6 +36,7 @@ public class Turret {
         this.follower = follower;
         // TODO: REPLACE FOLLOWER WITH TURRET LOCALIZER
         this.ballCounter = ballCounter;
+        this.telemetry = telemetry;
     }
 
     private int turretDegreesToEncoderTicks(double angle) {
@@ -73,8 +76,15 @@ public class Turret {
 
     private void runTurret(int ticks) {
         // TODO: STOP USING THE SDK RUN TO POSITION, REPLACE WITH A PROPER PID SYSTEM
-        motor.setTargetPosition(ticks);
-        motor.setVelocity(SubsystemConstants.turretRunSpeed);
+        if (!SubsystemConstants.debug) {
+            motor.setTargetPosition(ticks);
+            motor.setVelocity(SubsystemConstants.turretRunSpeed);
+        } else {
+            telemetry.addData("turret target position", ticks);
+            telemetry.addData("turret target angle", encoderTicksToTurretDegrees(ticks));
+            telemetry.addData("turret current position", motor.getCurrentPosition());
+            telemetry.addData("turret current angle", encoderTicksToTurretDegrees(motor.getCurrentPosition()));
+        }
     }
 
     private Command getHomePoint(boolean left){
@@ -84,7 +94,7 @@ public class Turret {
                     if (left) motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER); // reset encoder to 0, assume we are facing forwards (only if we're homing to the left, we don't do it again when homing right, as that could make the position we got on the left inaccurate)
                     motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     triggered = (left) ? leftLimit.isPressed() : rightLimit.isPressed();
-                    motor.setPower(SubsystemConstants.turretHomeSpeed * ((left) ? 1 : -1)); // swap the negative here if we move the wrong direction
+                    motor.setPower(SubsystemConstants.turretHomePower * ((left) ? 1 : -1)); // swap the negative here if we move the wrong direction
                 }).setDone(() -> (((left) ? leftLimit.isPressed() : rightLimit.isPressed()) != triggered))
                 .setEnd(endCondition -> {
                     motor.setPower(0);
@@ -101,7 +111,7 @@ public class Turret {
                 motor.setTargetPositionTolerance(0);
                 motor.setTargetPosition(center);
                 motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                motor.setPower(SubsystemConstants.turretHomeSpeed);
+                motor.setPower(SubsystemConstants.turretHomePower);
             })
             .setDone(() -> (motor.getCurrentPosition() == 0))
             .setEnd(endCondition -> {

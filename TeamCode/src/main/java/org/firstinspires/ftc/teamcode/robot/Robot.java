@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.robot;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.ivy.Command;
+import com.pedropathing.ivy.commands.Commands;
 import com.pedropathing.ivy.groups.Groups;
 import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.robot.RobotConstants.*;
 import org.firstinspires.ftc.teamcode.robot.systems.*;
 
@@ -22,8 +24,9 @@ public class Robot {
     private final GoalTracker goalTracker;
     private final Follower follower;
     private final InputHandler inputs;
+    public Command updateTelemetry;
 
-    public Robot(HardwareMap hardwareMap, Alliance alliance, Gamepad gamepad1, Gamepad gamepad2) {
+    public Robot(HardwareMap hardwareMap, Alliance alliance, Gamepad gamepad1, Gamepad gamepad2, Telemetry telemetry) {
         this.ballCounter = new BallCountClass();
         this.drivetrain = new Drivetrain(hardwareMap);
         this.follower = drivetrain.follower;
@@ -34,30 +37,34 @@ public class Robot {
 
         this.intake = new Intake(hardwareMap, ballCounter);
         this.transfer = new Transfer(hardwareMap,ballCounter);
-        this.turret = new Turret(hardwareMap, goalTracker, follower, ballCounter);
-        this.flywheel = new Flywheel(hardwareMap, ballCounter, follower, goalTracker);
+        this.turret = new Turret(hardwareMap, goalTracker, follower, ballCounter, telemetry);
+        this.flywheel = new Flywheel(hardwareMap, ballCounter, follower, goalTracker, telemetry);
 
         // TEMPORARY
         follower.setPose(new Pose(0,0,0));
         follower.update();
+        updateTelemetry = Commands.instant(telemetry::update);
     }
 
 
 
     public Command teleopInstants() {
-        return Groups.parallel(
-                drivetrain.update,
-                transfer.countBalls(),
-                flywheel.countBalls(),
+        return Groups.sequential(
+                Groups.parallel(
+                    drivetrain.update,
+                    transfer.countBalls(),
+                    flywheel.countBalls(),
 
-                goalTracker.updateGoal,
-                lynxHandler.update,
+                    goalTracker.updateGoal,
+                    lynxHandler.update,
 
-                drivetrain.driveWithPowers(inputs.driveForward(), inputs.driveLateral(), inputs.driveAngular()),
-                intake.runIntake,
-                transfer.runTransfer,
-                turret.runTurret,
-                flywheel.runTurret
+                    drivetrain.driveWithPowers(inputs.driveForward(), inputs.driveLateral(), inputs.driveAngular()),
+                    intake.runIntake,
+                    transfer.runTransfer,
+                    turret.runTurret,
+                    flywheel.runTurret
+                ),
+                updateTelemetry
         );
     }
 
@@ -68,5 +75,4 @@ public class Robot {
     public Command homeTurret() {
         return turret.home;
     }
-
 }

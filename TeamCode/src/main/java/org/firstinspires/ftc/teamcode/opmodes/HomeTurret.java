@@ -13,7 +13,7 @@ public class HomeTurret extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        Robot robot = new Robot(hardwareMap, RobotConstants.Alliance.BLUE, gamepad1, gamepad2);
+        Robot robot = new Robot(hardwareMap, RobotConstants.Alliance.BLUE, gamepad1, gamepad2, telemetry);
         Scheduler.reset();
 
         RevTouchSensor leftSwitch = hardwareMap.get(RevTouchSensor.class, RobotConstants.DeviceNames.leftTurretLimitSwitch);
